@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Agendamento - Lidiane Designer</title>
+</head>
+<body>
+  <h2>Agende seu horário com Lidiane Designer</h2>
+
+  <form id="formAgendamento">
+    <input type="text" name="nome" placeholder="Seu nome" required><br><br>
+    <input type="tel" name="telefone" placeholder="Seu WhatsApp" required><br><br>
+
+    <select name="servico" required>
+      <option value="">Selecione o serviço</option>
+      <option>Design Sobrancelha</option>
+      <option>Design com Henna</option>
+      <option>Lifting de Cílios</option>
+      <option>Brow Lamination</option>
+      <option>Maquiagem Express</option>
+      <option>Maquiagem Profissional</option>
+      <option>Micropigmentação</option>
+      <option>Penteado</option>
+      <option>Escova</option>
+      <option>Outros</option>
+    </select><br><br>
+
+    <input type="date" name="data" required><br><br>
+    <input type="time" name="hora" required><br><br>
+
+    <button type="submit">Agendar</button>
+  </form>
+
+  <script>
+    document.getElementById("formAgendamento").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const dados = new FormData(this);
+
+      fetch("https://script.google.com/macros/s/AKfycbxHjgkMSUXanbZLqH9S0TTNFDoP-klVSI5x9bj_CYe97ha8z-NQ3JpFdkeE-lzr6EI5/exec", {
+        method: "POST",
+        body: dados
+      }).then(() => {
+        alert("Agendamento enviado com sucesso!");
+        this.reset();
+      });
+    });
+  </script>
+
+</body>
+</html>
