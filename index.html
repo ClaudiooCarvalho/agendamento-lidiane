@@ -1,15 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Agendamento - Lidiane Designer</title>
+<meta charset="UTF-8">
+<title>Agendamento - Lidiane Designer</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
+
+.container {
+  max-width: 420px;
+  background: white;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+}
+
+h2 {
+  text-align: center;
+  color: #d63384;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+button {
+  background: #d63384;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #999;
+}
+
+#status {
+  margin-top: 12px;
+  text-align: center;
+  font-weight: bold;
+}
+</style>
 </head>
+
 <body>
-  <h2>Agende seu horário com Lidiane Designer</h2>
+
+<div class="container">
+  <h2>Agende seu horário</h2>
 
   <form id="formAgendamento">
-    <input type="text" name="nome" placeholder="Seu nome" required><br><br>
-    <input type="tel" name="telefone" placeholder="Seu WhatsApp" required><br><br>
+    <input type="text" name="nome" placeholder="Seu nome" required>
+    <input type="tel" name="telefone" placeholder="WhatsApp" required>
 
     <select name="servico" required>
       <option value="">Selecione o serviço</option>
@@ -22,30 +71,67 @@
       <option>Micropigmentação</option>
       <option>Penteado</option>
       <option>Escova</option>
-      <option>Outros</option>
-    </select><br><br>
+    </select>
 
-    <input type="date" name="data" required><br><br>
-    <input type="time" name="hora" required><br><br>
+    <input type="date" name="data" required>
 
-    <button type="submit">Agendar</button>
+    <select name="hora" id="hora" required></select>
+
+    <button id="btnAgendar" type="submit">Agendar</button>
+    <p id="status"></p>
   </form>
+</div>
 
-  <script>
-    document.getElementById("formAgendamento").addEventListener("submit", function(e){
-      e.preventDefault();
+<script>
+const form = document.getElementById("formAgendamento");
+const statusMsg = document.getElementById("status");
+const botao = document.getElementById("btnAgendar");
+const selectHora = document.getElementById("hora");
 
-      const dados = new FormData(this);
+// gera horários das 09:00 às 18:00 (último às 17:00)
+for (let h = 9; h <= 17; h++) {
+  let hora = (h < 10 ? "0" : "") + h + ":00";
+  let opt = document.createElement("option");
+  opt.value = hora;
+  opt.text = hora;
+  selectHora.appendChild(opt);
+}
 
-      fetch("https://script.google.com/macros/s/AKfycbxHjgkMSUXanbZLqH9S0TTNFDoP-klVSI5x9bj_CYe97ha8z-NQ3JpFdkeE-lzr6EI5/exec", {
-        method: "POST",
-        body: dados
-      }).then(() => {
-        alert("Agendamento enviado com sucesso!");
-        this.reset();
-      });
-    });
-  </script>
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  botao.disabled = true;
+  statusMsg.style.color = "black";
+  statusMsg.innerText = "Agendando, aguarde...";
+
+  const dados = new FormData(this);
+
+  fetch("https://script.google.com/macros/s/AKfycbw9B3X4t-FKxbxJdEwvSsBXG_1dWbwKN-jCqlOg6dEjaJadt_iLMN3fkLdXxUhEuvrl/exec", {
+    method: "POST",
+    body: dados
+  })
+  .then(res => res.text())
+  .then(resposta => {
+
+    if (resposta === "HORARIO_OCUPADO") {
+      statusMsg.style.color = "red";
+      statusMsg.innerText = "Esse horário já está ocupado. Escolha outro.";
+    } else {
+      window.open(resposta, "_blank");
+      statusMsg.style.color = "green";
+      statusMsg.innerText = "Agendamento confirmado com sucesso!";
+      form.reset();
+    }
+
+    botao.disabled = false;
+  })
+  .catch(() => {
+    statusMsg.style.color = "red";
+    statusMsg.innerText = "Erro ao enviar. Tente novamente.";
+    botao.disabled = false;
+  });
+});
+</script>
 
 </body>
 </html>
